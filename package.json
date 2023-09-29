@@ -1,0 +1,30 @@
+{
+  "name": "beth",
+  "module": "src/index.tsx",
+  "type": "module",
+  "scripts": {
+    "db:push": "bun x drizzle-kit push:sqlite",
+    "db:studio": "bun x drizzle-kit studio",
+    "dev": "bun run --watch src/index.tsx",
+    "tw": "bun x tailwindcss -i ./src/styles.css -o ./tailwind-gen/styles.css",
+    "tw:dev": "bun x tailwindcss -i ./src/styles.css -o ./tailwind-gen/styles.css --watch"
+  },
+  "devDependencies": {
+    "@flydotio/dockerfile": "latest",
+    "bun-types": "latest",
+    "concurrently": "^8.2.1",
+    "drizzle-kit": "^0.19.13",
+    "tailwindcss": "^3.3.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@elysiajs/html": "^0.7.0",
+    "@kitajs/html": "^2.2.2",
+    "@kitajs/ts-html-plugin": "^1.0.2",
+    "@libsql/client": "^0.3.5",
+    "drizzle-orm": "^0.28.6",
+    "elysia": "^0.7.15"
+  }
+}

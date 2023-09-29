@@ -1,0 +1,25 @@
+import { integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
+
+
+export const user = sqliteTable("user", {
+  id: text("id").primaryKey(),
+  content: text("email").notNull(),
+});
+
+export const burger_day = sqliteTable("todos", {
+  id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+  user_id: integer("user_id", { mode: "number" }).references(() => user.id).notNull(),
+  day: integer("timestamp", { mode: "number" }).notNull(),
+});
+
+export const burger_day_user = sqliteTable("burger_day_user", {
+  user_id: integer("user_id", { mode: "number" }).references(() => user.id).notNull(),
+  burger_day_id: integer("burger_day_id", { mode: "number" }).references(() => burger_day.id).notNull(),
+  payed: integer("payed", { mode: "boolean" }).notNull().default(false),
+  special_orders: text("special_orders"),
+}, (table) => {
+  return {
+    pk: primaryKey(table.user_id, table.burger_day_id),
+  }
+});
+
