@@ -1,10 +1,12 @@
-# fly.toml app configuration file generated for bethtest on 2023-07-16T04:53:13-05:00
+# fly.toml app configuration file generated for bethor-thursday on 2023-09-30T10:30:05+02:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "the-beth-stack"
-primary_region = "ord"
+app = "bethor-thursday"
+primary_region = "ams"
+
+[build]
 
 [http_service]
   internal_port = 3000

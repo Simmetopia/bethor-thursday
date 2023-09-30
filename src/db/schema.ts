@@ -37,7 +37,7 @@ export const burger_day = sqliteTable("todos", {
 });
 
 export const burger_day_user = sqliteTable("burger_day_user", {
-  user_id: integer("user_id", { mode: "number" }).references(() => user.id).notNull(),
+  user_id: text("user_id").references(() => user.id).notNull(),
   burger_day_id: integer("burger_day_id", { mode: "number" }).references(() => burger_day.id).notNull(),
   payed: integer("payed", { mode: "boolean" }).notNull().default(false),
   special_orders: text("special_orders"),

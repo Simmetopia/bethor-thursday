@@ -43,6 +43,13 @@
       "when": 1696018751090,
       "tag": "0005_melted_swordsman",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1696066171119,
+      "tag": "0006_foamy_living_tribunal",
+      "breakpoints": true
     }
   ]
 }
