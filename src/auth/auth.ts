@@ -3,7 +3,7 @@ import { lucia } from "lucia";
 import { libsql } from "@lucia-auth/adapter-sqlite";
 
 import { client } from '../db';
-import { elysia, web } from 'lucia/middleware';
+import { elysia } from 'lucia/middleware';
 import { google } from '@lucia-auth/oauth/providers'
 import Elysia from "elysia";
 import { parseCookie, serializeCookie } from "lucia/utils";
@@ -21,9 +21,8 @@ export const lucia_auth = lucia({
       family_name: databaseUser.family_name,
     }
   },
-
   middleware: elysia(),
-  env: "DEV",
+  env: process.env.NODE_ENV === "production" ? "PROD" : "DEV",
   sessionCookie: {
     expires: false,
   }

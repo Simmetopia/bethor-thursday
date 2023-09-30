@@ -15,7 +15,14 @@ export const app = new Elysia()
       </div>
     </BaseHtml>)
   .get("/", async (context) => {
-    return index(context.user!)
+    if (context.user)
+      return index(context.user)
+    else
+      return <BaseHtml>
+        <div>
+          <a href="/login/google">Login with google</a>
+        </div>
+      </BaseHtml>
   })
   .use(login_routes)
   .use(bday_elysia)

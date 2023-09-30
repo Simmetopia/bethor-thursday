@@ -13,14 +13,14 @@ export const middleware = new Elysia()
     const sesh = await ar.validate()
     return { user: sesh?.user ?? null }
   })
-  .onBeforeHandle(async (context) => {
-    if (!context.user && context.path !== "/login") {
-      context.set.redirect = "/login"
-    }
-  })
-  .onBeforeHandle(({ set }) => {
-    if (!isThursdayMiddleware() && process.env.NODE_ENV !== "development") {
-      set.status = 404
-      return <BaseHtml> <div> Not thursdag </div> </BaseHtml>
-    };
-  })
+  // .onBeforeHandle(async (context) => {
+  //   if (!context.user && context.path !== "/login") {
+  //     context.set.redirect = "/login"
+  //   }
+  // })
+  // .onBeforeHandle(({ set }) => {
+  //   if (!isThursdayMiddleware() && process.env.NODE_ENV !== "development") {
+  //     set.status = 404
+  //     return <BaseHtml> <div> Not thursdag </div> </BaseHtml>
+  //   };
+  // })
