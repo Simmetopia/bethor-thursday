@@ -52,14 +52,11 @@ export const usersRelations = relations(user, ({ many }) => ({
 }));
 
 export const burger_day_user = sqliteTable("burger_day_user", {
+  id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
   user_id: text("user_id").references(() => user.id).notNull(),
   burger_day_id: integer("burger_day_id", { mode: "number" }).references(() => burger_day.id).notNull(),
   payed: integer("payed", { mode: "boolean" }).notNull().default(false),
   special_orders: text("special_orders"),
-}, (table) => {
-  return {
-    pk: primaryKey(table.user_id, table.burger_day_id),
-  }
 });
 
 export const burger_day_user_relations = relations(burger_day_user, ({ one }) => ({

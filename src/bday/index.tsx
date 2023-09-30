@@ -115,17 +115,17 @@ const RenderName = (props: { user: typeof user.$inferSelect | null }) => {
 }
 
 export const OrderLineResponsible = ({ order }: OrderLineResponsibleProps) => (
-  <div class="flex flex-row gap-3" id={`order_line-${order.burger_day_id}`}>
+  <div class="flex flex-row gap-3 border shadow p-2 rounded" id={`order_line-${order.id}`}>
     <div class="flex flex-col gap-1">
       <p> <RenderName user={order.user} /> has ordered for burger day {order.burger_day_id} </p>
-      <p> Special orders: {order.special_orders} </p>
+      <p> <RenderTags tag={order.special_orders} /> </p>
     </div>
     {order.payed ?
       <span class="rounded-full px-3 py-1 bg-green-800 text-white items-center justify-center flex font-bold"> payed </span>
       : <form>
         <input type="hidden" name="burgerDayId" value={order.burger_day_id.toString()} />
         <input type="hidden" name="userId" value={order.user_id} />
-        <Button hx-post="/payed" hx-target={`#order_line-${order.burger_day_id}`} hx-swap="outerHTML"> register payment </Button>
+        <Button hx-post="/payed" hx-target={`#order_line-${order.id}`} hx-swap="outerHTML"> register payment </Button>
       </form>}
   </div>)
 
@@ -140,6 +140,32 @@ const OrdersForToday = async (props: { burgerDayId: number }) => {
     <div class="flex flex-col gap-3">
       You are today's burger day owner. You can see the orders below.
       <span class="rounded-full px-3 py-1 bg-blue-800 text-white font-bold"> {orders.length} orders today </span>
-      {orders.map(o => <OrderLineResponsible order={o} />)}
+      <div id="orders" class="flex flex-col gap-3 ">
+        {orders.map(o => <OrderLineResponsible order={o} />)}
+      </div>
     </div>)
+}
+
+
+const RenderTags = (props: { tag: string | null }) => {
+  if (props.tag === null) {
+    return ""
+  }
+  const tags = props.tag.split(", ")
+  return (
+    <div class="flex flex-row gap-1">
+      {
+        tags.map(t => <span class="rounded-full px-3 py-1 border  border-orange-700 text-white font-bold"> {tag_to_emoji(t)} </span>)
+      }
+    </div>)
+}
+
+const tag_to_emoji = (tag: string) => {
+  switch (tag) {
+    case "glutenfri": return "❌🌾"
+    case "ingen_salat": return "❌🥗"
+    case "ingen_bacon": return "❌🥓"
+    case "hvidløgsmayo": return "🧄"
+    default: return ""
+  }
 }

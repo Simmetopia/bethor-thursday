@@ -50,6 +50,13 @@
       "when": 1696066171119,
       "tag": "0006_foamy_living_tribunal",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1696096989083,
+      "tag": "0007_flashy_quasimodo",
+      "breakpoints": true
     }
   ]
 }
