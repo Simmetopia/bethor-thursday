@@ -3,6 +3,8 @@ import '@kitajs/html/register';
 
 import { db } from "../db"
 import { BaseHtml } from "..";
+import { User } from 'lucia';
+import { Button } from '../components/button';
 
 
 async function bday() {
@@ -27,20 +29,28 @@ async function bday() {
 }
 
 
-export async function index() {
+export async function index(user: User) {
   const burgerDay = await bday()
-
-  return (<BaseHtml>
-
-    {burgerDay ? <div> Yes, you can order </div> : <NoBurger />}
-  </BaseHtml>)
+  return (
+    <BaseHtml>
+      <Header fname={user?.given_name ?? ""} lname={user?.family_name ?? ""} />
+      {burgerDay ? <div> Yes, you can order </div> : <NoBurger userid={user?.userId} />}
+    </BaseHtml>)
 }
 
+const Header = ({ fname, lname }: { fname: string, lname: string }) => (
+  <h1 class="font-bold text-3xl text-blue-400 pb-8">
+    Welcome {fname} {lname}
+  </h1>)
 
-const NoBurger = () => (
-  <div>
-    No burger day created yet
-    <button hx-post="/create-daily"> create one? you will dedicate yourself to ordering and paying </button>
+
+const NoBurger = (props: { userid: string }) => (
+  <div class="flex flex-col gap-3">
+    <p class="italic text-blue-400 font-lg"> No burger day created yet</p>
+    <form>
+      <input type="hidden" name="userId" value={props.userid} />
+      <Button hx-post="/create-daily" > Let me be the one to do it today! (You will order and pickup)</Button>
+    </form>
   </div >
 )
 

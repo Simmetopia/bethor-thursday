@@ -15,6 +15,34 @@
       "when": 1695933705260,
       "tag": "0001_needy_magik",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1696007060756,
+      "tag": "0002_youthful_diamondback",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1696008775894,
+      "tag": "0003_big_monster_badoon",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1696009833690,
+      "tag": "0004_fresh_shockwave",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1696018751090,
+      "tag": "0005_melted_swordsman",
+      "breakpoints": true
     }
   ]
 }
