@@ -5,7 +5,7 @@ import { db } from "../db"
 import { User } from 'lucia';
 import { Button } from '../components/button';
 import { BaseHtml } from '../components/BaseHtml';
-import { burger_day_user } from '../db/schema';
+import { burger_day_user, user } from '../db/schema';
 
 
 async function bday() {
@@ -51,17 +51,21 @@ export const OrderLine = (props: typeof burger_day_user.$inferSelect) => (
 
 export async function index(user: User) {
   const burgerDay = await bday()
-
   const ordesrs = burgerDay && await orders(burgerDay.id, user.userId)
+
+
+  const is_owner = burgerDay?.user_id === user.userId;
+
   return (
     <BaseHtml>
       <div class="flex flex-col gap-3">
         <Header fname={user?.given_name ?? ""} lname={user?.family_name ?? ""} />
-        <div id="orders">
-          {ordesrs && ordesrs.map(o => (
-            <OrderLine {...o} />
-          ))}
-        </div>
+        {is_owner ? await <OrdersForToday burgerDayId={burgerDay.id} />
+          : <div id="orders">
+            {ordesrs && ordesrs.map(o => (
+              <OrderLine {...o} />
+            ))}
+          </div>}
         <div>
           {burgerDay ? <BurgerTime burgerdayId={burgerDay.id} /> : <NoBurger userid={user?.userId} />}
         </div>
@@ -76,7 +80,7 @@ const Header = ({ fname, lname }: { fname: string, lname: string }) => (
 
 const BurgerTime = (props: { burgerdayId: number }) => {
   return (
-    <form>
+    <form class="rounded shadow border-4 p-3 flex flex-row items-center justify-between">
       <input type="hidden" name="burgerDayId" value={props.burgerdayId.toString()} />
       <select name="special_order" multiple="true">
         <option value="glutenfri">Glutenfri</option>
@@ -87,9 +91,7 @@ const BurgerTime = (props: { burgerdayId: number }) => {
       <Button hx-post="/append_order" hx-target="#orders" hx-swap="beforeend"> Gimme burg today! </Button>
     </form>
   )
-
 }
-
 
 const NoBurger = (props: { userid: string }) => (
   <div class="flex flex-col gap-3">
@@ -101,3 +103,43 @@ const NoBurger = (props: { userid: string }) => (
   </div >
 )
 
+export type OrderLineResponsibleProps = {
+  order: typeof burger_day_user.$inferSelect & { user: typeof user.$inferSelect | null }
+}
+
+const RenderName = (props: { user: typeof user.$inferSelect | null }) => {
+  if (props.user === null) {
+    return <span class="text-red-500"> User not found </span>
+  }
+  return <span> {props.user.givenName} {props.user.familyName} </span>
+}
+
+export const OrderLineResponsible = ({ order }: OrderLineResponsibleProps) => (
+  <div class="flex flex-row gap-3" id={`order_line-${order.burger_day_id}`}>
+    <div class="flex flex-col gap-1">
+      <p> <RenderName user={order.user} /> has ordered for burger day {order.burger_day_id} </p>
+      <p> Special orders: {order.special_orders} </p>
+    </div>
+    {order.payed ?
+      <span class="rounded-full px-3 py-1 bg-green-800 text-white items-center justify-center flex font-bold"> payed </span>
+      : <form>
+        <input type="hidden" name="burgerDayId" value={order.burger_day_id.toString()} />
+        <input type="hidden" name="userId" value={order.user_id} />
+        <Button hx-post="/payed" hx-target={`#order_line-${order.burger_day_id}`} hx-swap="outerHTML"> register payment </Button>
+      </form>}
+  </div>)
+
+
+const OrdersForToday = async (props: { burgerDayId: number }) => {
+  const orders = await db.query.burger_day_user.findMany({
+    where: (burger_day_user, { eq }) => eq(burger_day_user.burger_day_id, props.burgerDayId),
+    with: { user: true }
+  })
+
+  return (
+    <div class="flex flex-col gap-3">
+      You are today's burger day owner. You can see the orders below.
+      <span class="rounded-full px-3 py-1 bg-blue-800 text-white font-bold"> {orders.length} orders today </span>
+      {orders.map(o => <OrderLineResponsible order={o} />)}
+    </div>)
+}

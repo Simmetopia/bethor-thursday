@@ -1,4 +1,5 @@
-import { blob, integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { relations } from "drizzle-orm";
+import { SQLiteColumn, blob, integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 
 export const user = sqliteTable("user", {
@@ -30,11 +31,25 @@ export const key = sqliteTable("user_key", {
     .references(() => user.id),
   hashedPassword: text("hashed_password")
 });
+
 export const burger_day = sqliteTable("todos", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
   user_id: text("user_id").references(() => user.id).notNull(),
   day: integer("timestamp", { mode: "number" }).notNull(),
 });
+
+export const burger_day_relations = relations(burger_day, ({ many, one }) => ({
+  burger_days_users: many(burger_day_user),
+  user: one(user, {
+    fields: [burger_day.user_id],
+    references: [user.id]
+  }),
+}));
+
+export const usersRelations = relations(user, ({ many }) => ({
+  burger_days: many(burger_day),
+  burger_days_users: many(burger_day_user)
+}));
 
 export const burger_day_user = sqliteTable("burger_day_user", {
   user_id: text("user_id").references(() => user.id).notNull(),
@@ -47,3 +62,15 @@ export const burger_day_user = sqliteTable("burger_day_user", {
   }
 });
 
+export const burger_day_user_relations = relations(burger_day_user, ({ one }) => ({
+  user: one(user, {
+    fields: [burger_day_user.user_id],
+    references: [user.id]
+  }),
+  burger_day: one(burger_day,
+    {
+      fields: [burger_day_user.burger_day_id],
+      references: [burger_day.id]
+    }
+  )
+}));
