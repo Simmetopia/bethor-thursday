@@ -5,7 +5,7 @@ import { db } from "../db"
 import { User } from 'lucia';
 import { Button } from '../components/button';
 import { BaseHtml } from '../components/BaseHtml';
-import { burger_day_user, user } from '../db/schema';
+import { burger_day_user, dbUser } from '../db/schema';
 
 
 async function bday() {
@@ -52,7 +52,6 @@ export const OrderLine = (props: typeof burger_day_user.$inferSelect) => (
 export async function index(user: User) {
   const burgerDay = await bday()
   const ordesrs = burgerDay && await orders(burgerDay.id, user.userId)
-
 
   const is_owner = burgerDay?.user_id === user.userId;
 
@@ -104,10 +103,10 @@ const NoBurger = (props: { userid: string }) => (
 )
 
 export type OrderLineResponsibleProps = {
-  order: typeof burger_day_user.$inferSelect & { user: typeof user.$inferSelect | null }
+  order: typeof burger_day_user.$inferSelect & { user: typeof dbUser.$inferSelect | null }
 }
 
-const RenderName = (props: { user: typeof user.$inferSelect | null }) => {
+const RenderName = (props: { user: typeof dbUser.$inferSelect | null }) => {
   if (props.user === null) {
     return <span class="text-red-500"> User not found </span>
   }
@@ -123,8 +122,7 @@ export const OrderLineResponsible = ({ order }: OrderLineResponsibleProps) => (
     {order.payed ?
       <span class="rounded-full px-3 py-1 bg-green-800 text-white items-center justify-center flex font-bold"> payed </span>
       : <form>
-        <input type="hidden" name="burgerDayId" value={order.burger_day_id.toString()} />
-        <input type="hidden" name="userId" value={order.user_id} />
+        <input type="hidden" name="burgerDayId" value={order.id.toString()} />
         <Button hx-post="/payed" hx-target={`#order_line-${order.id}`} hx-swap="outerHTML"> register payment </Button>
       </form>}
   </div>)

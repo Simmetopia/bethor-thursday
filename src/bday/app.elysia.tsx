@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import { burger_day, burger_day_user, user } from "../db/schema";
+import { burger_day, burger_day_user, dbUser } from "../db/schema";
 import { db } from "../db";
 import { middleware } from "../middleware";
 import { OrderLine, OrderLineResponsible, OrderLineResponsibleProps } from ".";
@@ -38,7 +38,15 @@ export const bday_elysia = new Elysia()
       .values({ user_id: user!.userId, burger_day_id: Number(body.burgerDayId), special_orders })
       .returning()
     const has = bday[0]
-    return (
+    const is_owner = has?.user_id === user!.userId;
+    console.log(is_owner)
+
+    const fullUser = await db.query.dbUser.findFirst({
+      where: eq(dbUser.id, has.user_id)
+    }) ?? null
+    return is_owner ? (
+      <OrderLineResponsible order={{ ...has, user: fullUser }} />
+    ) : (
       <OrderLine {...has} />
     )
   },
@@ -53,19 +61,16 @@ export const bday_elysia = new Elysia()
       .update(burger_day_user)
       .set({ payed: true })
       .where(
-        and(
-          eq(burger_day_user.user_id, body.userId),
-          eq(burger_day_user.burger_day_id, Number(body.burgerDayId))
-        )
+        eq(burger_day_user.burger_day_id, Number(body.burgerDayId)),
       )
       .returning()
+
     const firstorder: OrderLineResponsibleProps["order"] = { ...order_line[0], user: null }
+    console.log(firstorder)
 
-    firstorder.user = await db.query.user.findFirst({
-      where: eq(user.id, firstorder.user_id)
+    firstorder.user = await db.query.dbUser.findFirst({
+      where: eq(dbUser.id, firstorder.user_id)
     }) ?? null
-
-
 
     return (
       <OrderLineResponsible order={firstorder} />
@@ -73,7 +78,6 @@ export const bday_elysia = new Elysia()
   },
     {
       body: t.Object({
-        userId: t.String(),
         burgerDayId: t.String()
       })
     }

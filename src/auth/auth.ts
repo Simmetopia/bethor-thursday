@@ -31,7 +31,7 @@ export const lucia_auth = lucia({
 export const googleAuth = google(lucia_auth, {
   clientId: process.env.GOOGLE_OAUTH_CLIENT_ID!,
   clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET!,
-  redirectUri: "http://localhost:3000/login/google/callback",
+  redirectUri: process.env.AUTH_CALLBACK_URL!,
 })
 
 export type Auth = typeof lucia_auth;
