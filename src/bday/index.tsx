@@ -59,7 +59,7 @@ export async function index(user: User) {
     <BaseHtml>
       <div class="flex flex-col gap-3">
         <Header fname={user?.given_name ?? ""} lname={user?.family_name ?? ""} />
-        {is_owner ? await <OrdersForToday burgerDayId={burgerDay.id} />
+        {is_owner && burgerDay ? await <OrdersForToday burgerDayId={burgerDay.id} />
           : <div id="orders">
             {ordesrs && ordesrs.map(o => (
               <OrderLine {...o} />
@@ -81,11 +81,12 @@ const BurgerTime = (props: { burgerdayId: number }) => {
   return (
     <form class="rounded shadow border-4 p-3 flex flex-row items-center justify-between">
       <input type="hidden" name="burgerDayId" value={props.burgerdayId.toString()} />
-      <select name="special_order" multiple="true">
+      <select name="special_order" multiple="true" >
         <option value="glutenfri">Glutenfri</option>
         <option value="ingen_salat">Uden salat</option>
         <option value="ingen_bacon">Uden bacon</option>
         <option value="hvidløgsmayo">Hvidløgsmayo</option>
+        <option selected="true" value="chilimayo">chilimayo</option>
       </select>
       <Button hx-post="/append_order" hx-target="#orders" hx-swap="beforeend"> Gimme burg today! </Button>
     </form>
@@ -123,7 +124,8 @@ export const OrderLineResponsible = ({ order }: OrderLineResponsibleProps) => (
       <span class="rounded-full px-3 py-1 bg-green-800 text-white items-center justify-center flex font-bold"> payed </span>
       : <form>
         <input type="hidden" name="burgerDayId" value={order.id.toString()} />
-        <Button hx-post="/payed" hx-target={`#order_line-${order.id}`} hx-swap="outerHTML"> register payment </Button>
+
+        <Button hx-post="/payed" hx-target={`#order_line-${order.id}`} hx-swap="outerHTML" > register payment </Button>
       </form>}
   </div>)
 
@@ -164,6 +166,7 @@ const tag_to_emoji = (tag: string) => {
     case "ingen_salat": return "❌🥗"
     case "ingen_bacon": return "❌🥓"
     case "hvidløgsmayo": return "🧄"
+    case "chilimayo": return "🌶️"
     default: return ""
   }
 }

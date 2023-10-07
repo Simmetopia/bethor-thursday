@@ -32,7 +32,10 @@ export const bday_elysia = new Elysia()
     })
   })
   .post("/append_order", async ({ body, user }) => {
-    const special_orders = body.special_order.join(", ")
+    const special_orders = Array.isArray(body.special_order)
+      ? body.special_order.join(", ")
+      : body.special_order
+
     const bday = await db
       .insert(burger_day_user)
       .values({ user_id: user!.userId, burger_day_id: Number(body.burgerDayId), special_orders })
@@ -53,28 +56,31 @@ export const bday_elysia = new Elysia()
     {
       body: t.Object({
         burgerDayId: t.String(),
-        special_order: t.Array(t.String())
+        special_order: t.Union([t.Array(t.String()), t.String()])
       })
     })
   .post("/payed", async ({ body }) => {
-    const order_line = await db
-      .update(burger_day_user)
-      .set({ payed: true })
-      .where(
-        eq(burger_day_user.burger_day_id, Number(body.burgerDayId)),
+    console.log(Number(body.burgerDayId))
+    try {
+      const order_line = await db
+        .update(burger_day_user)
+        .set({ payed: true })
+        .where(
+          eq(burger_day_user.id, Number(body.burgerDayId)),
+        ).returning()
+
+      const firstorder: OrderLineResponsibleProps["order"] = { ...order_line[0], user: null }
+
+      firstorder.user = await db.query.dbUser.findFirst({
+        where: eq(dbUser.id, firstorder.user_id)
+      }) ?? null
+
+      return (
+        <OrderLineResponsible order={firstorder} />
       )
-      .returning()
-
-    const firstorder: OrderLineResponsibleProps["order"] = { ...order_line[0], user: null }
-    console.log(firstorder)
-
-    firstorder.user = await db.query.dbUser.findFirst({
-      where: eq(dbUser.id, firstorder.user_id)
-    }) ?? null
-
-    return (
-      <OrderLineResponsible order={firstorder} />
-    )
+    } catch (e) {
+      return <div> error </div>
+    }
   },
     {
       body: t.Object({
@@ -82,4 +88,6 @@ export const bday_elysia = new Elysia()
       })
     }
   )
+
+
 
