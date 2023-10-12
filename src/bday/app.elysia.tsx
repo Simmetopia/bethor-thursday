@@ -3,7 +3,7 @@ import { burger_day, burger_day_user, dbUser } from "../db/schema";
 import { db } from "../db";
 import { middleware } from "../middleware";
 import { OrderLine, OrderLineResponsible, OrderLineResponsibleProps } from ".";
-import { and, eq } from "drizzle-orm";
+import { and, eq, gte, lte } from "drizzle-orm";
 
 
 enum options {
@@ -35,13 +35,16 @@ export const bday_elysia = new Elysia()
     const special_orders = Array.isArray(body.special_order)
       ? body.special_order.join(", ")
       : body.special_order
+    // find todays burger burger_day
+    const twoday = await TwodayBurger()
+    if (!twoday) return <div> no burger day </div>
 
     const bday = await db
       .insert(burger_day_user)
       .values({ user_id: user!.userId, burger_day_id: Number(body.burgerDayId), special_orders })
       .returning()
     const has = bday[0]
-    const is_owner = has?.user_id === user!.userId;
+    const is_owner = twoday.user_id === user!.userId;
     console.log(is_owner)
 
     const fullUser = await db.query.dbUser.findFirst({
@@ -90,4 +93,25 @@ export const bday_elysia = new Elysia()
   )
 
 
+export async function TwodayBurger() {
+  // Get the current date and set the time to 00:00:00
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
 
+  // Get the current date and set the time to 23:59:59
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+
+  // Convert these to Unix timestamps (in seconds)
+  const startTimestamp = Math.floor(startOfDay.getTime() / 1000);
+  const endTimestamp = Math.floor(endOfDay.getTime() / 1000);
+
+  // Use these timestamps in your query
+  return db.query.burger_day.findFirst({
+    where: and(
+      gte(burger_day.day, startTimestamp),
+      lte(burger_day.day, endTimestamp)
+    )
+
+  });
+}
