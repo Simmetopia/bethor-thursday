@@ -115,7 +115,10 @@ const RenderName = (props: { user: typeof dbUser.$inferSelect | null }) => {
 }
 
 export const OrderLineResponsible = ({ order }: OrderLineResponsibleProps) => (
-  <div _="init get the (value of #order_amount as an Int increment it put it into #order_amount" class="flex flex-row gap-3 border shadow p-2 rounded" id={`order_line-${order.id}`}>
+  <div
+    _="init get (innerHTML of #order_amount) as an Int increment it then set  (innerHTML of #order_amount) to it"
+    class="flex flex-row gap-3 border shadow p-2 rounded"
+    id={`order_line-${order.id}`}>
     <div class="flex flex-col gap-1">
       <p> <RenderName user={order.user} /> has ordered for burger day {order.burger_day_id} </p>
       <p> <RenderTags tag={order.special_orders} /> </p>
@@ -139,7 +142,7 @@ const OrdersForToday = async (props: { burgerDayId: number }) => {
   return (
     <div class="flex flex-col gap-3">
       You are today's burger day owner. You can see the orders below.
-      <span id="order_amount" class="rounded-full px-3 py-1 bg-blue-800 text-white font-bold"> {orders.length} </span><span> orders today </span>
+      <span id="order_amount" class="rounded-full px-3 py-1 bg-blue-800 text-white font-bold"> 0 </span><span> orders today </span>
       <div id="orders" class="flex flex-col gap-3 ">
         {orders.map(o => <OrderLineResponsible order={o} />)}
       </div>
