@@ -6,6 +6,7 @@ import { User } from 'lucia';
 import { Button } from '../components/button';
 import { BaseHtml } from '../components/BaseHtml';
 import { burger_day_user, dbUser } from '../db/schema';
+import { Checkmark } from '../icons/checkmark';
 
 
 async function bday() {
@@ -49,6 +50,10 @@ export const OrderLine = (props: typeof burger_day_user.$inferSelect) => (
   </div>)
 
 
+function Summery() {
+    return null;
+}
+
 export async function index(user: User) {
   const burgerDay = await bday()
   const ordesrs = burgerDay && await orders(burgerDay.id, user.userId)
@@ -57,23 +62,28 @@ export async function index(user: User) {
 
   return (
     <BaseHtml>
-      <div class="flex flex-col gap-3">
-        <Header fname={user?.given_name ?? ""} lname={user?.family_name ?? ""} />
-        {is_owner && burgerDay ? await <OrdersForToday burgerDayId={burgerDay.id} />
-          : <div id="orders">
-            {ordesrs && ordesrs.map(o => (
-              <OrderLine {...o} />
-            ))}
-          </div>}
+      <div class="flex flex-row gap-3">
+        <div class="flex flex-col gap-3">
+          <Header fname={user?.given_name ?? ""} lname={user?.family_name ?? ""} />
+          {is_owner && burgerDay ? await <OrdersForToday burgerDayId={burgerDay.id} />
+            : <div id="orders">
+              {ordesrs && ordesrs.map(o => (
+                <OrderLine {...o} />
+              ))}
+            </div>}
+          <div>
+            {burgerDay ? <BurgerTime burgerdayId={burgerDay.id} /> : <NoBurger userid={user?.userId} />}
+          </div>
+        </div>
         <div>
-          {burgerDay ? <BurgerTime burgerdayId={burgerDay.id} /> : <NoBurger userid={user?.userId} />}
+          <Summery />
         </div>
       </div>
     </BaseHtml>)
 }
 
 const Header = ({ fname, lname }: { fname: string, lname: string }) => (
-  <h1 class="font-bold text-3xl text-blue-400 pb-8">
+  <h1 safe class="font-bold text-3xl text-blue-400 pb-8">
     Welcome {fname} {lname}
   </h1>)
 
@@ -81,7 +91,7 @@ const BurgerTime = (props: { burgerdayId: number }) => {
   return (
     <form class="rounded shadow border-4 p-3 flex flex-row items-center justify-between">
       <input type="hidden" name="burgerDayId" value={props.burgerdayId.toString()} />
-      <select name="special_order" multiple="true" >
+      <select class="text-slate-700" name="special_order" multiple="true" >
         <option value="glutenfri">Glutenfri</option>
         <option value="ingen_salat">Uden salat</option>
         <option value="ingen_bacon">Uden bacon</option>
@@ -116,7 +126,6 @@ const RenderName = (props: { user: typeof dbUser.$inferSelect | null }) => {
 
 export const OrderLineResponsible = ({ order }: OrderLineResponsibleProps) => (
   <div
-    // _="init get (innerHTML of #order_amount) as an Int increment it then set  (innerHTML of #order_amount) to it"
     _="init set (innerHTML of #order_amount) to #orders.children.length"
     class="flex flex-row gap-3 border shadow p-2 rounded"
     id={`order_line-${order.id}`}>
@@ -125,9 +134,9 @@ export const OrderLineResponsible = ({ order }: OrderLineResponsibleProps) => (
       <p> <RenderTags tag={order.special_orders} /> </p>
     </div>
     {order.payed ?
-      <span class="rounded-full px-3 py-1 bg-green-800 text-white items-center justify-center flex font-bold"> payed </span>
+      <span class="rounded-full px-3 py-1  text-green-600 items-center justify-center flex font-extrabold"> <Checkmark /> </span>
       : <form>
-        <input type="hidden" name="burgerDayId" value={order.id.toString()} />
+        <input type="hidden" name="burgerDayId" safe value={order.id.toString()} />
 
         <Button hx-post="/payed" hx-target={`#order_line-${order.id}`} hx-swap="outerHTML" > register payment </Button>
       </form>}
@@ -140,12 +149,14 @@ const OrdersForToday = async (props: { burgerDayId: number }) => {
     with: { user: true }
   })
 
-  return (
+    return (
     <div class="flex flex-col gap-3">
       You are today's burger day owner. You can see the orders below.
       <span id="order_amount" class="rounded-full px-3 py-1 bg-blue-800 text-white font-bold"> 0 </span><span> orders today </span>
       <div id="orders" class="flex flex-col gap-3 ">
-        {orders.map(o => <OrderLineResponsible order={o} />)}
+        {
+            orders.map(o => <OrderLineResponsible  order={o} />)
+        }
       </div>
     </div>)
 }
@@ -159,7 +170,7 @@ const RenderTags = (props: { tag: string | null }) => {
   return (
     <div class="flex flex-row gap-1">
       {
-        tags.map(t => <span class="rounded-full px-3 py-1 border  border-orange-700 text-white font-bold"> {tag_to_emoji(t)} </span>)
+        tags.map(t => <span class="rounded-full px-3 py-1 border  border-slate-100 text-white font-bold"> {tag_to_emoji(t)} </span>)
       }
     </div>)
 }

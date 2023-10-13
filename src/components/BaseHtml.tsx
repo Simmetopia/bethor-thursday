@@ -13,9 +13,7 @@ export const BaseHtml = ({ children }: PropsWithChildren) => (
         <link href="/styles.css" rel="stylesheet" />
       </head>
       <body class="grid bg-slate-800 text-slate-100 place-items-center min-h-screen">
-        <div class=" rounded bg-white shadow text-black p-3">
-          {children}
-        </div>
+        {children}
       </body>
     </html >
   </>)
