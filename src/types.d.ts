@@ -10,3 +10,6 @@ declare namespace Lucia {
   };
   type DatabaseSessionAttributes = {};
 }
+
+declare namespace JSX {
+}

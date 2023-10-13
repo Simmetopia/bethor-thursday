@@ -116,7 +116,8 @@ const RenderName = (props: { user: typeof dbUser.$inferSelect | null }) => {
 
 export const OrderLineResponsible = ({ order }: OrderLineResponsibleProps) => (
   <div
-    _="init get (innerHTML of #order_amount) as an Int increment it then set  (innerHTML of #order_amount) to it"
+    // _="init get (innerHTML of #order_amount) as an Int increment it then set  (innerHTML of #order_amount) to it"
+    _="init set (innerHTML of #order_amount) to #orders.children.length"
     class="flex flex-row gap-3 border shadow p-2 rounded"
     id={`order_line-${order.id}`}>
     <div class="flex flex-col gap-1">
