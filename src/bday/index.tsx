@@ -45,13 +45,13 @@ const orders = async (burgerDayId: number, user_id: string) =>
 export const OrderLine = (props: typeof burger_day_user.$inferSelect) => (
   <div class="bg-slate-800 shadow rounded text-stone-100 p-3">
     <p> You have ordered for burger day {props.burger_day_id} </p>
-    <p> Your special orders are: {props.special_orders} </p>
+    <p safe> Your special orders are: {props.special_orders} </p>
     <p> payment status: {props.payed ? "payed" : "NO PAY YET, YOU PAY NOW"} </p>
   </div>)
 
 
 function Summery() {
-    return null;
+  return null;
 }
 
 export async function index(user: User) {
@@ -121,7 +121,7 @@ const RenderName = (props: { user: typeof dbUser.$inferSelect | null }) => {
   if (props.user === null) {
     return <span class="text-red-500"> User not found </span>
   }
-  return <span> {props.user.givenName} {props.user.familyName} </span>
+  return <span safe> {props.user.givenName} {props.user.familyName} </span>
 }
 
 export const OrderLineResponsible = ({ order }: OrderLineResponsibleProps) => (
@@ -135,8 +135,8 @@ export const OrderLineResponsible = ({ order }: OrderLineResponsibleProps) => (
     </div>
     {order.payed ?
       <span class="rounded-full px-3 py-1  text-green-600 items-center justify-center flex font-extrabold"> <Checkmark /> </span>
-      : <form>
-        <input type="hidden" name="burgerDayId" safe value={order.id.toString()} />
+      : <form >
+        <input type="hidden" name="burgerDayId" value={order.id.toString()} />
 
         <Button hx-post="/payed" hx-target={`#order_line-${order.id}`} hx-swap="outerHTML" > register payment </Button>
       </form>}
@@ -149,13 +149,13 @@ const OrdersForToday = async (props: { burgerDayId: number }) => {
     with: { user: true }
   })
 
-    return (
+  return (
     <div class="flex flex-col gap-3">
       You are today's burger day owner. You can see the orders below.
       <span id="order_amount" class="rounded-full px-3 py-1 bg-blue-800 text-white font-bold"> 0 </span><span> orders today </span>
       <div id="orders" class="flex flex-col gap-3 ">
         {
-            orders.map(o => <OrderLineResponsible  order={o} />)
+          orders.map(o => <OrderLineResponsible order={o} />)
         }
       </div>
     </div>)

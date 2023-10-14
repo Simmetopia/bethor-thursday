@@ -4,10 +4,12 @@ import { index } from "./bday"
 import { bday_elysia } from "./bday/app.elysia"
 import { BaseHtml } from "./components/BaseHtml"
 import { middleware } from "./middleware"
+import staticPlugin from "@elysiajs/static"
 
 
 export const app = new Elysia()
   .use(middleware)
+  .use(staticPlugin())
   .get("/login", async () =>
     <BaseHtml>
       <div>

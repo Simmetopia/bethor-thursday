@@ -10,8 +10,12 @@ export const BaseHtml = ({ children }: PropsWithChildren) => (
         <title>Bethorday</title>
         <script src="https://unpkg.com/htmx.org@1.9.3"></script>
         <script src="https://unpkg.com/hyperscript.org@0.9.9"></script>
-        <link href="/styles.css" rel="stylesheet" />
-      </head>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@unocss/reset/tailwind.min.css"
+        />
+        <link rel="stylesheet" href="/public/dist/unocss.css" />
+      </ head>
       <body class="grid bg-slate-800 text-slate-100 place-items-center min-h-screen">
         {children}
       </body>
