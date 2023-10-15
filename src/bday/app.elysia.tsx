@@ -4,6 +4,7 @@ import { db } from "../db";
 import { middleware } from "../middleware";
 import { OrderLine, OrderLineResponsible, OrderLineResponsibleProps } from ".";
 import { and, eq, gte, lte } from "drizzle-orm";
+import { OrderAccumulator } from "../components/order_accumulator";
 
 
 enum options {
@@ -13,6 +14,7 @@ enum options {
   hvidløgsmayo = "hvidløgsmayo"
 }
 const options_list = Object.values(options)
+
 export const bday_elysia = new Elysia()
   .use(middleware)
   .post("/create-daily", async ({ set, body }) => {
@@ -33,7 +35,7 @@ export const bday_elysia = new Elysia()
   })
   .post("/append_order", async ({ body, user }) => {
     const special_orders = Array.isArray(body.special_order)
-      ? body.special_order.join(", ")
+      ? body.special_order.sort().join(", ")
       : body.special_order
     // find todays burger burger_day
     const twoday = await TwodayBurger()
@@ -91,6 +93,12 @@ export const bday_elysia = new Elysia()
       })
     }
   )
+  .get("accumulate", async ({ set, user }) => {
+    const twodayBurger = await TwodayBurger()
+    if (!twodayBurger) return <div> no burger day </div>
+
+    return OrderAccumulator({ burgerDayId: twodayBurger.id })
+  })
 
 
 export async function TwodayBurger() {

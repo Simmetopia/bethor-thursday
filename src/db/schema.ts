@@ -58,6 +58,7 @@ export const burger_day_user = sqliteTable("burger_day_user", {
   payed: integer("payed", { mode: "boolean" }).notNull().default(false),
   special_orders: text("special_orders"),
 });
+export type Order = typeof burger_day_user.$inferSelect;
 
 export const burger_day_user_relations = relations(burger_day_user, ({ one }) => ({
   user: one(dbUser, {

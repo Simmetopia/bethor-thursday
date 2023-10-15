@@ -3,9 +3,8 @@ import { createClient } from "@libsql/client";
 import * as schema from "./schema";
 
 export const client = createClient({
-  syncUrl: process.env.DATABASE_URL!,
-  url: "file:local.db",
-  authToken: process.env.DATABASE_AUTH_TOKEN,
+  url: process.env.DATABASE_URL!,
+  authToken: process.env.DATABASE_AUTH_TOKEN!,
 });
 
 setInterval(() => {

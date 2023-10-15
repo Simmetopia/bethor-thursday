@@ -26,9 +26,11 @@
     "@libsql/client": "^0.3.5",
     "@lucia-auth/adapter-sqlite": "^2.0.0",
     "@lucia-auth/oauth": "^3.3.1",
+    "@types/ramda": "^0.29.6",
     "@unocss/transformer-variant-group": "^0.56.5",
     "drizzle-orm": "^0.28.6",
     "elysia": "^0.7.16",
-    "lucia": "^2.7.1"
+    "lucia": "^2.7.1",
+    "ramda": "^0.29.1"
   }
 }
