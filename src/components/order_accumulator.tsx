@@ -1,9 +1,10 @@
-import { PropsWithChildren } from "@kitajs/html";
-import { db } from "../db";
-import { Order, burger_day_user, dbUser } from "../db/schema";
-import { eq } from "drizzle-orm";
-import { count, filter, groupBy, map, mapObjIndexed, pipe } from "ramda";
-import { BaseHtml } from "./BaseHtml";
+import {PropsWithChildren} from "@kitajs/html";
+import {db} from "../db";
+import {burger_day_user, dbUser, Order} from "../db/schema";
+import {eq} from "drizzle-orm";
+import {count, countBy, filter, groupBy, join, map, mapObjIndexed, pipe, split, tap} from "ramda";
+import {BaseHtml} from "./BaseHtml";
+import {options} from "../bday/app.elysia.tsx";
 
 export type OrderAccumulatorProps = {
   burgerDayId: number
@@ -13,10 +14,16 @@ export async function OrderAccumulator(props: PropsWithChildren<OrderAccumulator
     where: eq(burger_day_user.burger_day_id, props.burgerDayId),
   })
 
-  const order = pipe(
+  const order  = pipe(
     groupBy<Order>((order) => order.special_orders!),
-    mapObjIndexed((value, _key, _obj) => {
-      return value?.length
+    mapObjIndexed((value, key, _obj) => {
+      const data = pipe(
+          split(","),
+          filter<string>(x => x.indexOf("mayo") === -1),
+          join(', ')
+      )(key)
+
+      return [value?.length || 0, data]
     }))
 
   const nonPayed = pipe(
@@ -31,19 +38,30 @@ export async function OrderAccumulator(props: PropsWithChildren<OrderAccumulator
   const ordersT = order(orders)
 
   const mpda = await Promise.all(nonPayed(orders))
+  const amount_of_garlic_mayos = pipe(
+      map<Order, string >((order) => order.special_orders || ""),
+      count<string>((order) => {
+        const thing =  order.indexOf("hvidløgsmayo") !== -1
+        return thing
+      })
+  )(orders)
+  const amount_of_chilies = orders.length - amount_of_garlic_mayos;
 
 
   return (
     <BaseHtml>
       <div class="rounded-xl border-slate-300 border-6 p-3">
         {ordersT && Object.keys(ordersT).map((key) => {
+          const [first, second] = ordersT[key] ?? [0, ""]
           return (
             <p>
-              {key} : {ordersT[key]}
+              {first} {second}
             </p>
           )
         })
         }
+        <h4 class="text-2xl mt-4"> Number of garlic MAYOS = {amount_of_garlic_mayos} </h4>
+        <h4 class="text-2xl mt-4"> Number of chiliBoiz = {amount_of_chilies} </h4>
         <h4 class="text-2xl mt-4"> Non paying plebs </h4>
         <div class="">
           {mpda.map((order) => {

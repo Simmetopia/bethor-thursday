@@ -8,5 +8,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="htmx.org" level="application" />
+    <orderEntry type="library" name="hyperscript.org" level="application" />
+    <orderEntry type="library" name="@unocss/reset" level="application" />
   </component>
 </module>
