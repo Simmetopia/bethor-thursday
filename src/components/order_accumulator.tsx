@@ -1,10 +1,10 @@
-import {PropsWithChildren} from "@kitajs/html";
-import {db} from "../db";
-import {burger_day_user, dbUser, Order} from "../db/schema";
-import {eq} from "drizzle-orm";
-import {count, countBy, filter, groupBy, join, map, mapObjIndexed, pipe, split, tap} from "ramda";
-import {BaseHtml} from "./BaseHtml";
-import {options} from "../bday/app.elysia.tsx";
+import { PropsWithChildren } from "@kitajs/html";
+import { db } from "../db";
+import { burger_day_user, dbUser, Order } from "../db/schema";
+import { eq } from "drizzle-orm";
+import { count, countBy, filter, groupBy, join, map, mapObjIndexed, pipe, split, tap } from "ramda";
+import { BaseHtml } from "./BaseHtml";
+import { options } from "../bday/app.elysia.tsx";
 
 export type OrderAccumulatorProps = {
   burgerDayId: number
@@ -14,17 +14,20 @@ export async function OrderAccumulator(props: PropsWithChildren<OrderAccumulator
     where: eq(burger_day_user.burger_day_id, props.burgerDayId),
   })
 
-  const order  = pipe(
+  const order = pipe(
     groupBy<Order>((order) => order.special_orders!),
     mapObjIndexed((value, key, _obj) => {
       const data = pipe(
-          split(","),
-          filter<string>(x => x.indexOf("mayo") === -1),
-          join(', ')
+        split(","),
+        filter<string>(x => x.indexOf("mayo") === -1),
+        join(', ')
       )(key)
 
       return [value?.length || 0, data]
-    }))
+    }),
+    filter<Array<string | number>>(([, s]) => s !== "")
+
+  )
 
   const nonPayed = pipe(
     filter<Order>((order) => !order.payed),
@@ -39,11 +42,11 @@ export async function OrderAccumulator(props: PropsWithChildren<OrderAccumulator
 
   const mpda = await Promise.all(nonPayed(orders))
   const amount_of_garlic_mayos = pipe(
-      map<Order, string >((order) => order.special_orders || ""),
-      count<string>((order) => {
-        const thing =  order.indexOf("hvidløgsmayo") !== -1
-        return thing
-      })
+    map<Order, string>((order) => order.special_orders || ""),
+    count<string>((order) => {
+      const thing = order.indexOf("hvidløgsmayo") !== -1
+      return thing
+    })
   )(orders)
   const amount_of_chilies = orders.length - amount_of_garlic_mayos;
 
@@ -60,6 +63,7 @@ export async function OrderAccumulator(props: PropsWithChildren<OrderAccumulator
           )
         })
         }
+        <h4 class="text-3xl mt-4"> Total orders = {orders.length} </h4>
         <h4 class="text-2xl mt-4"> Number of garlic MAYOS = {amount_of_garlic_mayos} </h4>
         <h4 class="text-2xl mt-4"> Number of chiliBoiz = {amount_of_chilies} </h4>
         <h4 class="text-2xl mt-4"> Non paying plebs </h4>
