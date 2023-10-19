@@ -36,6 +36,7 @@ export const burger_day = sqliteTable("todos", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
   user_id: text("user_id").references(() => dbUser.id).notNull(),
   day: integer("timestamp", { mode: "number" }).notNull(),
+  telephone: text("telephone"),
 });
 
 export const burger_day_relations = relations(burger_day, ({ many, one }) => ({

@@ -42,11 +42,12 @@ const orders = async (burgerDayId: number, user_id: string) =>
     })
 
 
-export const OrderLine = (props: typeof burger_day_user.$inferSelect) => (
+export const OrderLine = (props: { bgdayUser: typeof burger_day_user.$inferSelect, num: string }) => (
   <div class="bg-slate-800 shadow rounded text-stone-100 p-3">
-    <p> You have ordered for burger day {props.burger_day_id} </p>
-    <p safe> Your special orders are: {props.special_orders} </p>
-    <p> payment status: {props.payed ? "payed" : "NO PAY YET, YOU PAY NOW"} </p>
+    <p class="font-bold"> you pay to tlf: {props.num} </p>
+    <p class="font-bold text-xl"> payment status: {props.bgdayUser.payed ? "payed" : "NO PAY YET, YOU PAY NOW"} </p>
+    <p> You have ordered for burger day {props.bgdayUser.burger_day_id} </p>
+    <p safe> Your special orders are: {props.bgdayUser.special_orders} </p>
   </div>)
 
 
@@ -68,7 +69,7 @@ export async function index(user: User) {
           {is_owner && burgerDay ? await <OrdersForToday burgerDayId={burgerDay.id} />
             : <div id="orders">
               {ordesrs && ordesrs.map(o => (
-                <OrderLine {...o} />
+                <OrderLine bgdayUser={o} num={burgerDay.telephone || "No number given"} />
               ))}
             </div>}
           <div>
