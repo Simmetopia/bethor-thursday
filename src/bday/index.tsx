@@ -44,9 +44,10 @@ const orders = async (burgerDayId: number, user_id: string) =>
 
 export const OrderLine = (props: { bgdayUser: typeof burger_day_user.$inferSelect, num: string | null, price?: number }) => (
   <div class="bg-slate-800 shadow rounded text-stone-100 p-3">
-    {props.num ?? <p class="font-bold"> you pay to tlf: {props.num} </p>}
-    {props.price ?? <p class="font-bold"> Special price 4 u my friend: {props.price} </p>}
+    {props.num && <p class="font-extrabold"> you pay to tlf: {props.num} </p>}
+    {props.price && <p class="font-bold"> Special price 4 u my friend: {props.price} </p>}
     <p class="font-bold text-xl"> payment status: {props.bgdayUser.payed ? "payed" : "NO PAY YET, YOU PAY NOW"} </p>
+
     <p> You have ordered for burger day {props.bgdayUser.burger_day_id} </p>
     <p safe> Your special orders are: {props.bgdayUser.special_orders} </p>
   </div>)
@@ -86,8 +87,8 @@ export async function index(user: User) {
 }
 
 const PhoneAndPriceEdit = (props: { burgerDayId: number }) => (
-  <form class="flex flex-row gap-3">
-    <input type="hidden" type="number" name="burgerDayId" value={props.burgerDayId.toString()} />
+  <form class="flex flex-row gap-3 text-slate-800">
+    <input type="hidden" name="burgerDayId" value={props.burgerDayId.toString()} />
     <label class="flex flex-col">
       <span class="text-blue-400 font-bold"> Phone number </span>
       <input type="tel" name="telephone" class="rounded shadow border-4 p-3" />

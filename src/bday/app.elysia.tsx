@@ -85,7 +85,8 @@ export const bday_elysia = new Elysia()
     await db
       .update(burger_day)
       .set({
-        telephone: body.telephone
+        telephone: body.telephone,
+        price: Number(body.price)
       })
       .where(eq(burger_day.id, Number(body.burgerDayId)))
 
