@@ -37,6 +37,7 @@ export const burger_day = sqliteTable("todos", {
   user_id: text("user_id").references(() => dbUser.id).notNull(),
   day: integer("timestamp", { mode: "number" }).notNull(),
   telephone: text("telephone"),
+  price: integer("price", { mode: "number" }).notNull().default(79),
 });
 
 export const burger_day_relations = relations(burger_day, ({ many, one }) => ({

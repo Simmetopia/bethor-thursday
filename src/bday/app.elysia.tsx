@@ -12,7 +12,8 @@ export enum options {
   glutenfri = "glutenfri",
   ingen_salat = "ingen salat",
   ingen_bacon = "ingen bacon",
-  hvidløgsmayo = "hvidløgsmayo"
+  hvidløgsmayo = "hvidløgsmayo",
+  uden_ost = "uden_ost",
 }
 
 const options_list = Object.values(options)
@@ -75,11 +76,41 @@ export const bday_elysia = new Elysia()
       })
     }
   )
-  .get("accumulate", async ({ set, user }) => {
+  .get("accumulate", async () => {
     const twodayBurger = await TwodayBurger()
     if (!twodayBurger) return <div> no burger day </div>
     return OrderAccumulator({ burgerDayId: twodayBurger.id })
   })
+  .post("/edit", async ({ set, body }) => {
+    await db
+      .update(burger_day)
+      .set({
+        telephone: body.telephone
+      })
+      .where(eq(burger_day.id, Number(body.burgerDayId)))
+
+    set.status = 200
+    return ["ok", "you did it"]
+
+  },
+    {
+      body: t.Object({
+        burgerDayId: t.String(),
+        telephone: t.String(),
+        price: t.Union([t.String(), t.Literal('')]),
+      })
+    }
+  )
+
+
+const coerceEmptyStringToNumber = (value: string, defaultValue: number) => {
+  if (value === '') {
+    return defaultValue;
+  }
+  return Number(value);
+};
+
+
 
 
 export async function TwodayBurger() {

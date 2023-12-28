@@ -5,7 +5,7 @@ import { db } from "../db"
 import { User } from 'lucia';
 import { Button } from '../components/button';
 import { BaseHtml } from '../components/BaseHtml';
-import { burger_day_user, dbUser } from '../db/schema';
+import { burger_day, burger_day_user, dbUser } from '../db/schema';
 import { Checkmark } from '../icons/checkmark';
 
 
@@ -42,9 +42,10 @@ const orders = async (burgerDayId: number, user_id: string) =>
     })
 
 
-export const OrderLine = (props: { bgdayUser: typeof burger_day_user.$inferSelect, num: string }) => (
+export const OrderLine = (props: { bgdayUser: typeof burger_day_user.$inferSelect, num: string | null, price?: number }) => (
   <div class="bg-slate-800 shadow rounded text-stone-100 p-3">
-    <p class="font-bold"> you pay to tlf: {props.num} </p>
+    {props.num ?? <p class="font-bold"> you pay to tlf: {props.num} </p>}
+    {props.price ?? <p class="font-bold"> Special price 4 u my friend: {props.price} </p>}
     <p class="font-bold text-xl"> payment status: {props.bgdayUser.payed ? "payed" : "NO PAY YET, YOU PAY NOW"} </p>
     <p> You have ordered for burger day {props.bgdayUser.burger_day_id} </p>
     <p safe> Your special orders are: {props.bgdayUser.special_orders} </p>
@@ -66,10 +67,11 @@ export async function index(user: User) {
       <div class="flex flex-row gap-3">
         <div class="flex flex-col gap-3">
           <Header fname={user?.given_name ?? ""} lname={user?.family_name ?? ""} />
+          {is_owner && burgerDay ? <PhoneAndPriceEdit burgerDayId={burgerDay.id} /> : ""}
           {is_owner && burgerDay ? await <OrdersForToday burgerDayId={burgerDay.id} />
             : <div id="orders">
               {ordesrs && ordesrs.map(o => (
-                <OrderLine bgdayUser={o} num={burgerDay.telephone || "No number given"} />
+                <OrderLine bgdayUser={o} price={burgerDay.price} num={burgerDay.telephone} />
               ))}
             </div>}
           <div>
@@ -82,6 +84,21 @@ export async function index(user: User) {
       </div>
     </BaseHtml>)
 }
+
+const PhoneAndPriceEdit = (props: { burgerDayId: number }) => (
+  <form class="flex flex-row gap-3">
+    <input type="hidden" type="number" name="burgerDayId" value={props.burgerDayId.toString()} />
+    <label class="flex flex-col">
+      <span class="text-blue-400 font-bold"> Phone number </span>
+      <input type="tel" name="telephone" class="rounded shadow border-4 p-3" />
+    </label>
+    <label class="flex flex-col">
+      <span class="text-blue-400 font-bold"> Price </span>
+      <input type="number" name="price" class="rounded shadow border-4 p-3" />
+    </label>
+    <Button hx-post="/edit"> Edit </Button>
+  </form>
+)
 
 const Header = ({ fname, lname }: { fname: string, lname: string }) => (
   <h1 safe class="font-bold text-3xl text-blue-400 pb-8">
@@ -97,6 +114,7 @@ const BurgerTime = (props: { burgerdayId: number }) => {
         <option value="ingen_salat">Uden salat</option>
         <option value="ingen_bacon">Uden bacon</option>
         <option value="hvidløgsmayo">Hvidløgsmayo</option>
+        <option value="uden_ost">Uden ost</option>
         <option selected="true" value="chilimayo">chilimayo</option>
       </select>
       <Button hx-post="/append_order" hx-target="#orders" hx-swap="beforeend"> Gimme burg today! </Button>
@@ -181,6 +199,7 @@ const tag_to_emoji = (tag: string) => {
     case "glutenfri": return "❌🌾"
     case "ingen_salat": return "❌🥗"
     case "ingen_bacon": return "❌🥓"
+    case "ingen_bacon": return "❌🧀"
     case "hvidløgsmayo": return "🧄"
     case "chilimayo": return "🌶️"
     default: return ""
